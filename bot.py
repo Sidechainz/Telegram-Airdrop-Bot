@@ -1,4 +1,6 @@
 # %% Dependencies
+from gettext import NullTranslations
+from tracemalloc import stop
 from telegram import ReplyKeyboardMarkup, ReplyKeyboardRemove, Update, InlineKeyboardMarkup
 from bson.json_util import dumps
 from multicolorcaptcha import CaptchaGenerator
@@ -42,6 +44,7 @@ ADMIN_USERNAME = os.environ["ADMIN_USERNAME"]
 
 TWITTER_LINKS = os.environ["TWITTER_LINKS"]
 TELEGRAM_LINKS = os.environ["TELEGRAM_LINKS"]
+MONGO_URL=os.environ["MONGO_URL"] or None
 RETWEET_LINKS = os.environ["RETWEET_LINKS"]
 MAX_USERS = int(os.environ["MAX_USERS"])
 MAX_REFS = int(os.environ["MAX_REFS"])
@@ -60,7 +63,7 @@ else:
     BOT_STATUS = {"status": "ON"}
 
 # %% MONGODB CONNECTION
-CONNECTION_STRING = f"mongodb://{MONGO_USER}:{MONGO_PASSWORD}@{MONGO_IP}:{MONGO_PORT}/?authSource=admin"
+CONNECTION_STRING = MONGO_URL if MONGO_URL else  f"mongodb://{MONGO_USER}:{MONGO_PASSWORD}@{MONGO_IP}:{MONGO_PORT}/?authSource=admin"
 myclient = pymongo.MongoClient(CONNECTION_STRING)
 mydb = myclient["airdrop"]
 users = mydb["users"]
