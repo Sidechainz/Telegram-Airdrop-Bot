@@ -42,6 +42,7 @@ ADMIN_USERNAME = os.environ["ADMIN_USERNAME"]
 
 TWITTER_LINKS = os.environ["TWITTER_LINKS"]
 TELEGRAM_LINKS = os.environ["TELEGRAM_LINKS"]
+RETWEET_LINKS = os.environ["RETWEET_LINKS"]
 MAX_USERS = int(os.environ["MAX_USERS"])
 MAX_REFS = int(os.environ["MAX_REFS"])
 CAPTCHA_ENABLED = os.environ["CAPTCHA_ENABLED"]
@@ -49,6 +50,7 @@ CAPTCHA_ENABLED = os.environ["CAPTCHA_ENABLED"]
 TWITTER_LINKS = TWITTER_LINKS.split(",")
 TELEGRAM_LINKS = TELEGRAM_LINKS.split(",")
 TWITTER_LINKS = "\n".join(TWITTER_LINKS)
+RETWEET_LINKS = "\n" .join(RETWEET_LINKS)
 TELEGRAM_LINKS = "\n".join(TELEGRAM_LINKS)
 STATUS_PATH = "./conversationbot/botconfig.p"
 if os.path.exists(STATUS_PATH):
@@ -98,8 +100,10 @@ PROCEED_MESSAGE = f"""
 📢 Airdrop Rules
 
 ✏️ Mandatory Tasks:
-- Join our telegram channels
-- Follow our Twitter page
+- 🎯Join our telegram channels
+- 🎯Follow our Twitter page
+- 🎯Like and Retweet our pinned Post
+- 🎯Tag 3 friends
 
 NOTE: Users found Cheating would be disqualified & banned immediately.
 
@@ -108,13 +112,18 @@ Airdrop Date: *{AIRDROP_DATE}*{EXPLORER_URL}
 """
 
 MAKE_SURE_TELEGRAM = f"""
-Do no forget to join our Telegram channel
+🔹 Join our Telegram channel
 {TELEGRAM_LINKS}
 """
 
 FOLLOW_TWITTER_TEXT = f"""
 🔹 Follow our Twitter page
 {TWITTER_LINKS}
+"""
+
+RETWEET_TWITTER_TEXT = f"""
+🔹 RETWEET PINNED TWEET AND TAG 3 FRIENDS
+{RETWEET_LINKS}
 """
 
 
@@ -258,7 +267,7 @@ def submit_details(update, context):
     return FOLLOW_TELEGRAM
 
 
-def follow_telegram(update, context):
+def follow_telegram(update, self, check, context):
     update.message.reply_text(text=MAKE_SURE_TELEGRAM, parse_mode=telegram.ParseMode.MARKDOWN)
     update.message.reply_text(text="Please click on \"Done\" to proceed", parse_mode=telegram.ParseMode.MARKDOWN, reply_markup=ReplyKeyboardMarkup(
         [["Done"], ["Cancel"]]
@@ -267,15 +276,23 @@ def follow_telegram(update, context):
     return FOLLOW_TWITTER
 
 
-def follow_twitter(update, context):
+def follow_twitter(update, self, check, context):
     update.message.reply_text(text=FOLLOW_TWITTER_TEXT, parse_mode=telegram.ParseMode.MARKDOWN)
     update.message.reply_text(text="Type in *your Twitter username* to proceed", parse_mode=telegram.ParseMode.MARKDOWN, reply_markup=ReplyKeyboardMarkup(
         [["Cancel"]]
     ))
-    return SUBMIT_ADDRESS
+
+    return RETWEET_TWITTER
+
+def retweet_twitter(update, self, check, context):
+    update.message.reply_text(text=RETWEET_TWITTER_TEXT , parse_mode=telegram.ParseMode.MARKDOWN)
+    update.message.reply_text(text="Paste  *your Retweet Link* to proceed", parse_mode=telegram.ParseMode.MARKDOWN, reply_markup=ReplyKeyboardMarkup(
+        [["Cancel"]]
+    ))
+    return SUBMIT_ADDRESS   
 
 
-def submit_address(update, context):
+def submit_address(update, self, check, context):
     user = update.message.from_user
     if not user.id in USERINFO:
         return startAgain(update, context)
@@ -426,12 +443,13 @@ reply_keyboard = [
     ["💸 Withdrawal", "🔗 Ref Link"],
     ["💾 My Data", "Quit Airdrop"]
 ]
-PROCEED, FOLLOW_TELEGRAM, FOLLOW_TWITTER, SUBMIT_ADDRESS, END_CONVERSATION, LOOP, SUREWANTTO, CAPTCHASTATE = range(8)
+PROCEED, FOLLOW_TELEGRAM, FOLLOW_TWITTER, RETWEET_TWITTER, SUBMIT_ADDRESS, END_CONVERSATION, LOOP, SUREWANTTO, CAPTCHASTATE = range(9)
 cancelHandler = MessageHandler(Filters.regex('^Cancel$'), cancel)
 states = {
     PROCEED: [MessageHandler(Filters.regex('^🚀 Join Airdrop$'), submit_details), cancelHandler],
     FOLLOW_TELEGRAM: [MessageHandler(Filters.regex('^Submit Details$'), follow_telegram), cancelHandler],
     FOLLOW_TWITTER: [MessageHandler(Filters.regex('^Done$'), follow_twitter), cancelHandler],
+    RETWEET_TWITTER: [MessageHandler(Filters.regex('^Done$'), retweet_twitter), cancelHandler],
     SUBMIT_ADDRESS: [cancelHandler, MessageHandler(Filters.text, submit_address)],
     END_CONVERSATION: [cancelHandler, MessageHandler(Filters.regex('^0x[a-fA-F0-9]{40}$'), end_conversation)],
     LOOP: [MessageHandler(
