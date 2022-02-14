@@ -52,9 +52,10 @@ CAPTCHA_ENABLED = os.environ["CAPTCHA_ENABLED"]
 
 TWITTER_LINKS = TWITTER_LINKS.split(",")
 TELEGRAM_LINKS = TELEGRAM_LINKS.split(",")
+RETWEET_LINKS = RETWEET_LINKS.split(",")
 TWITTER_LINKS = "\n".join(TWITTER_LINKS)
-RETWEET_LINKS = "\n" .join(RETWEET_LINKS)
 TELEGRAM_LINKS = "\n".join(TELEGRAM_LINKS)
+RETWEET_LINKS = "\n" .join(RETWEET_LINKS)
 STATUS_PATH = "./conversationbot/botconfig.p"
 if os.path.exists(STATUS_PATH):
     BOT_STATUS = {}
@@ -149,7 +150,7 @@ REPLACEME
 """
 
 WITHDRAWAL_TEXT = f"""
-Withdrawals would be sent out automatically to your {AIRDROP_NETWORK} address on the {AIRDROP_DATE}
+Withdrawals would be sent out automatically to your {AIRDROP_NETWORK} address  {AIRDROP_DATE}
 NOTE: Users found Cheating would be disqualified & banned immediately."""
 
 BALANCE_TEXT = f"""
@@ -270,7 +271,7 @@ def submit_details(update, context):
     return FOLLOW_TELEGRAM
 
 
-def follow_telegram(update, self, check, context):
+def follow_telegram(update, context):
     update.message.reply_text(text=MAKE_SURE_TELEGRAM, parse_mode=telegram.ParseMode.MARKDOWN)
     update.message.reply_text(text="Please click on \"Done\" to proceed", parse_mode=telegram.ParseMode.MARKDOWN, reply_markup=ReplyKeyboardMarkup(
         [["Done"], ["Cancel"]]
@@ -279,27 +280,28 @@ def follow_telegram(update, self, check, context):
     return FOLLOW_TWITTER
 
 
-def follow_twitter(update, self, check, context):
+def follow_twitter(update, context):
     update.message.reply_text(text=FOLLOW_TWITTER_TEXT, parse_mode=telegram.ParseMode.MARKDOWN)
-    update.message.reply_text(text="Type in *your Twitter username* to proceed", parse_mode=telegram.ParseMode.MARKDOWN, reply_markup=ReplyKeyboardMarkup(
-        [["Cancel"]]
+    update.message.reply_text(text="Please click on \"Done\" to proceed", parse_mode=telegram.ParseMode.MARKDOWN, reply_markup=ReplyKeyboardMarkup(
+        [["Done"], ["Cancel"]]
     ))
 
     return RETWEET_TWITTER
 
-def retweet_twitter(update, self, check, context):
-    update.message.reply_text(text=RETWEET_TWITTER_TEXT , parse_mode=telegram.ParseMode.MARKDOWN)
-    update.message.reply_text(text="Paste  *your Retweet Link* to proceed", parse_mode=telegram.ParseMode.MARKDOWN, reply_markup=ReplyKeyboardMarkup(
-        [["Cancel"]]
-    ))
-    return SUBMIT_ADDRESS   
-
-
-def submit_address(update, self, check, context):
+def retweet_twitter(update, context):
     user = update.message.from_user
     if not user.id in USERINFO:
         return startAgain(update, context)
-    USERINFO[user.id].update({"twitter_username": update.message.text.strip()})
+    update.message.reply_text(text=RETWEET_TWITTER_TEXT , parse_mode=telegram.ParseMode.MARKDOWN)
+    update.message.reply_text(text="Paste  *your Retweet Link* to proceed", parse_mode=telegram.ParseMode.MARKDOWN)
+    return SUBMIT_ADDRESS   
+
+
+def submit_address(update, context):
+    user = update.message.from_user
+    if not user.id in USERINFO:
+        return startAgain(update, context)
+    USERINFO[user.id].update({"retweet_link": update.message.text})
     update.message.reply_text(text=SUBMIT_BEP20_TEXT, parse_mode=telegram.ParseMode.MARKDOWN, reply_markup=ReplyKeyboardMarkup(
         [["Cancel"]]
     ))
@@ -421,12 +423,12 @@ Here is *your referral link*
         balance = BALANCE_TEXT.replace("IARTBALANCE", AIRDROP_AMOUNT).replace("REFERRALBALANCE", refbal)
         refferals = str(info["refCount"])
         bep20Address = str(info["bep20"])
-        twitterUsername = str(info["twitter_username"])
+        twitterUsername = str(info["retweet_link"])
         reply = f"""
 Name: {name}
 Referrals: {refferals}
 {AIRDROP_NETWORK} address: {bep20Address}
-Twitter Username: {twitterUsername}
+Retweet Link: {twitterUsername}
 """
     if(reply == ""):
         joke = getRandomJoke()
@@ -525,5 +527,16 @@ dispatcher.add_handler(CommandHandler("stats", getStats))
 dispatcher.add_handler(CommandHandler("bot", setStatus))
 dispatcher.add_handler(conv_handler)
 # %% start the bot
-updater.start_polling()
-updater.idle()
+mode = os.getenv("MODE")
+if mode == "dev":
+    updater.start_polling()
+elif mode == "prod":   
+    PORT = int(os.environ.get("PORT", "8443"))
+    HEROKU_APP_NAME = os.environ.get("HEROKU_APP_NAME")
+    # Code from https://github.com/python-telegram-bot/python-telegram-bot/wiki/Webhooks#heroku
+    updater.start_webhook(listen="0.0.0.0",
+                              port=PORT,
+                              url_path=BOT_TOKEN)
+    updater.bot.set_webhook("https://{}.herokuapp.com/{}".format(HEROKU_APP_NAME,BOT_TOKEN))
+
+# updater.idle()
