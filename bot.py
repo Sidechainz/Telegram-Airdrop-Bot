@@ -88,9 +88,9 @@ if(EXPLORER_URL != ""):
 if(WEBSITE_URL != ""):
     WEBSITE_URL = f"\nWebsite: {WEBSITE_URL}"
 WELCOME_MESSAGE = f"""
-Hello, NAME! I am your friendly {COIN_NAME} Airdrop bot
+Hello, NAME! Welcome {COIN_NAME} Airdrop bot
 {SYMBOL}
-🔸For Joining - Get {AIRDROP_AMOUNT} {COIN_SYMBOL}
+🔸Airdrop Reward - Get {AIRDROP_AMOUNT} {COIN_SYMBOL}
 ⭐️ For each referral - Get {"{:,.2f}".format(REFERRAL_REWARD)} {COIN_SYMBOL}
 
 📘By Participating you are agreeing to the {COIN_NAME} (Airdrop) Program Terms and Conditions. Please see pinned post for more information.
@@ -104,8 +104,12 @@ PROCEED_MESSAGE = f"""
 📢 Airdrop Rules
 
 ✏️ Mandatory Tasks:
+- 🎯Join our telegram group
+    https://t.me/metaapestokengroup
 - 🎯Join our telegram channels
+    https://t.me/metaapestoken
 - 🎯Follow our Twitter page
+    http://twitter.com/metaapestoken
 - 🎯Like and Retweet our pinned Post
 - 🎯Tag 3 friends
 
@@ -117,6 +121,7 @@ Airdrop Date: *{AIRDROP_DATE}*{EXPLORER_URL}
 
 MAKE_SURE_TELEGRAM = f"""
 🔹 Join our Telegram channel
+🔹 Join our Telegram group
 {TELEGRAM_LINKS}
 """
 
