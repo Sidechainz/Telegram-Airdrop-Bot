@@ -143,7 +143,7 @@ Please make sure your wallet supports the *{AIRDROP_NETWORK}*
 
 JOINED = f"""
 Thank you!
-Rewards would be sent out automatically to your {AIRDROP_NETWORK} address on the {AIRDROP_DATE}
+Rewards would be sent out automatically to your {AIRDROP_NETWORK} address.
 
 Don't forget to:
 🔸 Stay in the telegram channels
