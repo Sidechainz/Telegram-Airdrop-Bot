@@ -114,7 +114,7 @@ PROCEED_MESSAGE = f"""
 
 NOTE: Users found Cheating would be disqualified & banned immediately.
 
-Airdrop Date: *{AIRDROP_DATE}*{EXPLORER_URL}
+Airdrop Date: * TBD *{EXPLORER_URL}
 {WEBSITE_URL}
 """
 
