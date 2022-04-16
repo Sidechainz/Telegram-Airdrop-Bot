@@ -81,7 +81,7 @@ dispatcher = updater.dispatcher
 if(COIN_PRICE == "0"):
     SYMBOL = ""
 else:
-    SYMBOL = f"\n⭐️ 1 {COIN_SYMBOL} = {COIN_PRICE}"
+    SYMBOL = f"\n⭐️ {COIN_SYMBOL}  {COIN_PRICE}"
 if(EXPLORER_URL != ""):
     EXPLORER_URL = f"\nContract: {EXPLORER_URL}"
 if(WEBSITE_URL != ""):
