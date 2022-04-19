@@ -114,7 +114,7 @@ PROCEED_MESSAGE = f"""
 
 NOTE: Users found Cheating would be disqualified & banned immediately.
 
-Airdrop Date: * TBD *{EXPLORER_URL}
+Airdrop Date: * 1 WEEK AFTER LUNCH ON PANCAKESWAP *{EXPLORER_URL}
 {WEBSITE_URL}
 """
 
